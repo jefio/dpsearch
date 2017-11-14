@@ -232,7 +232,7 @@ def dpsearch(X, alpha, G0_alpha, beam_size):
 
         # expand by existing cluster
         for k in range(s['nb_clusters']):
-            size_ = sum(1 for c in s['c'] if c == k)
+            size_ = np.sum(s['c'] == k)
             size_counts = np.array(s['size_counts'])
             size_counts[size_ - 1] -= 1
             if size_ == len(size_counts):
