@@ -2,9 +2,13 @@
 Example: clustering the 20 newsgroups text dataset.
 """
 import argparse
+from collections import Counter
 
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 from dpsearch import dpsearch
 
@@ -17,14 +21,15 @@ def get_dataset(keep_words):
     # filter terms
     tvec = TfidfVectorizer(
         max_df=0.5, max_features=keep_words, stop_words='english')
-    tvec.fit(dataset.data)
+    X_tfidf = tvec.fit_transform(dataset.data).toarray()
     terms = tvec.get_feature_names()
 
     # DPSearch needs integer data
     cvec = CountVectorizer(vocabulary=terms, dtype=int)
-    X = cvec.fit_transform(dataset.data).toarray()
+    X_count = cvec.fit_transform(dataset.data).toarray()
     return {
-        'X': X,
+        'X_tfidf': X_tfidf,
+        'X_count': X_count,
         'y': dataset.target,
         'terms': terms
     }
