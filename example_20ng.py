@@ -85,14 +85,15 @@ def main():
     parser.add_argument('-g', '--g0-alpha', type=float, default=10,
                         help='Concentration parameter of G0')
     parser.add_argument('-b', '--beam-size', type=int, default=100)
-    # pre-processing options
+    # other options
     parser.add_argument('-k', '--keep-words', type=int, default=1000)
+    parser.add_argument('-e', '--exp-name', type=str, default='A')
     args = parser.parse_args()
 
     dataset = get_dataset(args.keep_words)
-    s = dpsearch(dataset['X'], args.alpha, args.g0_alpha, args.beam_size)
-    print(s)
-
+    s = dpsearch(dataset['X_count'], args.alpha, args.g0_alpha, args.beam_size)
+    plot_clustering(dataset, s['c'], args.exp_name)
+    write_clusters_top_words(dataset, s['c'], args.exp_name)
 
 if __name__ == '__main__':
     main()
