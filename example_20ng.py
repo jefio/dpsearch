@@ -31,8 +31,50 @@ def get_dataset(keep_words):
         'X_tfidf': X_tfidf,
         'X_count': X_count,
         'y': dataset.target,
+        'target_names': dataset.target_names,
         'terms': terms
     }
+
+
+def plot_clustering(dataset, pred_clusters, exp_name):
+    pxt_mat = get_pxt_mat(dataset['y'], pred_clusters)
+    df = pd.DataFrame(pxt_mat, columns=dataset['target_names'])
+    df.plot.bar(stacked=True)
+    plt.xlabel('Cluster ID')
+    plt.ylabel('Nb of samples')
+    plt.title('Clusters composition')
+    filename = "exp_{}_composition.png".format(exp_name)
+    plt.savefig(filename)
+    plt.close()
+
+
+def get_pxt_mat(y, pred_clusters):
+    n_classes = len(set(y))
+    n_pred_clusters = len(set(pred_clusters))
+    pxt_mat = np.zeros((n_pred_clusters, n_classes), int)
+    for cdx in range(n_pred_clusters):
+        idxs, = np.where(pred_clusters == cdx)
+        class_counter = Counter(y[idxs])
+        pxt_mat[cdx] = [class_counter[c] for c in range(n_classes)]
+
+    # plot clusters ordered by size
+    cdxs = np.argsort(pxt_mat.sum(axis=1))[::-1]
+    pxt_mat = pxt_mat[cdxs]
+
+    return pxt_mat
+
+
+def write_clusters_top_words(dataset, pred_clusters, exp_name):
+    n_pred_clusters = len(set(pred_clusters))
+    filename = "exp_{}_words.csv".format(exp_name)
+    with open(filename, 'w') as fwrite:
+        for cdx in range(n_pred_clusters):
+            idxs, = np.where(pred_clusters == cdx)
+            xis = dataset['X_tfidf'][idxs]
+            fdxs = np.argsort(xis.max(axis=0))[-20:]
+            top_terms = [dataset['terms'][fdx] for fdx in fdxs]
+            line = ','.join(top_terms)
+            fwrite.write(line + '\n')
 
 
 def main():
