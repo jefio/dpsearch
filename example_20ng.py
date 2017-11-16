@@ -16,7 +16,8 @@ from dpsearch import dpsearch
 def get_dataset(keep_words):
     categories = ['alt.atheism', 'talk.religion.misc',
                   'comp.graphics', 'sci.space']
-    dataset = fetch_20newsgroups(subset='all', categories=categories)
+    dataset = fetch_20newsgroups(subset='all', categories=categories,
+                                 remove=('headers', 'footers', 'quotes'))
 
     # filter terms
     tvec = TfidfVectorizer(
@@ -27,10 +28,12 @@ def get_dataset(keep_words):
     # DPSearch needs integer data
     cvec = CountVectorizer(vocabulary=terms, dtype=int)
     X_count = cvec.fit_transform(dataset.data).toarray()
+    doc_lengths = X_count.sum(axis=1)
+    idxs = (10 <= doc_lengths) & (doc_lengths < 100)
     return {
-        'X_tfidf': X_tfidf,
-        'X_count': X_count,
-        'y': dataset.target,
+        'X_tfidf': X_tfidf[idxs],
+        'X_count': X_count[idxs],
+        'y': dataset.target[idxs],
         'target_names': dataset.target_names,
         'terms': terms
     }
