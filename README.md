@@ -3,6 +3,10 @@
 Dirichlet process mixture model for clustering text data.
 `dpsearch.py` is a Python translation of the original matlab code.
 
+## Dependencies
+
+Python 3.6, NumPy, SciPy, Pandas, Scikit-learn and Matplotlib.
+
 ## Example
 
 ```
